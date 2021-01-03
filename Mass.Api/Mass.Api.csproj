@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>0e2f5e4c-de42-4d9c-8c25-2ec7f8dbe7ab</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MassTransit.Analyzers" Version="6.2.3" />
+    <PackageReference Include="MassTransit.AspNetCore" Version="6.2.3" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="6.2.3" />
+    <PackageReference Include="MassTransit" Version="6.2.3" />    
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\mass.components\mass.components.csproj" />
+    <ProjectReference Include="..\mass.contracts\mass.contracts.csproj" />
+  </ItemGroup>
+
+
+</Project>
