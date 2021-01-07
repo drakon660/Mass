@@ -21,7 +21,7 @@ namespace mass.components.Consumers
             _logger?.Log(LogLevel.Debug, "SubmitOrderConsumer: {CustomerNumber}", context.Message.CustomerNumber);
 
             if (context.Message.CustomerNumber.Contains("TEST"))
-            {
+            {                
                 if (context.RequestId != null)
                     await context.RespondAsync<OrderSubmissionRejected>(new
                     {
@@ -34,13 +34,13 @@ namespace mass.components.Consumers
                 return;
             }
 
-            MessageData<string> notes = context.Message.Notes;
-            if (notes?.HasValue ?? false)
-            {
-                string notesValue = await notes.Value;
+            //MessageData<string> notes = context.Message.Notes;
+            //if (notes?.HasValue ?? false)
+            //{
+            //    string notesValue = await notes.Value;
 
-                Console.WriteLine("NOTES: {0}", notesValue);
-            }
+            //    Console.WriteLine("NOTES: {0}", notesValue);
+            //}
 
             await context.Publish<OrderSubmitted>(new
             {

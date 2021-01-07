@@ -52,6 +52,9 @@ namespace Mass.Api
                 cfg.AddConsumer<SubmitOrderConsumer>();
                 cfg.AddBus(x => Bus.Factory.CreateUsingRabbitMq());
                 cfg.AddRequestClient<SubmitOrder>();
+                cfg.AddRequestClient<CheckOrder>();
+                //cfg.AddRequestClient<SubmitOrder>(new Uri($"queue :{KebabCaseEndpointNameFormatter.Instance.Consumer<SubmitOrderConsumer>()}"));
+                //cfg.AddRequestClient<SubmitOrder>(new Uri($"exchange :{KebabCaseEndpointNameFormatter.Instance.Consumer<SubmitOrderConsumer>()}"));
                 //cfg.AddRequestClient<AllocateInventory>();
             });
 

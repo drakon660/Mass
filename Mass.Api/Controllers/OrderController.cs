@@ -15,11 +15,33 @@ namespace Mass.Api.Controllers
     public class OrderController : ControllerBase
     {
         private readonly IRequestClient<SubmitOrder> _submitOrderRequestClient;
+        private readonly IRequestClient<CheckOrder> _checkOrderRequestClient;
+        private readonly ISendEndpointProvider _sendEndpointProvider;
 
-        public OrderController(IRequestClient<SubmitOrder> submitOrderRequestClient)
+        public OrderController(IRequestClient<SubmitOrder> submitOrderRequestClient, IRequestClient<CheckOrder> checkOrderRequestClient, ISendEndpointProvider sendEndpointProvider)
         {
             _submitOrderRequestClient = submitOrderRequestClient;
+            _checkOrderRequestClient = checkOrderRequestClient;
+            _sendEndpointProvider = sendEndpointProvider;
         }
+
+
+        [HttpPut]
+        public async Task<IActionResult> Put(Guid id, string customerNumber)
+        {
+            var endpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri("exchange:submit-order"));
+
+            await endpoint.Send<SubmitOrder>(new
+            {
+                OrderId = id,
+                InVar.Timestamp,
+                CustomerNumber = customerNumber
+            });
+
+            return Accepted();
+        }
+
+
 
         [HttpPost]
         public async Task<IActionResult> Post(OrderViewModel model)
@@ -54,6 +76,23 @@ namespace Mass.Api.Controllers
                 var response = await rejected;
 
                 return BadRequest(response.Message);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Get(Guid id)
+        {
+            var (status,notfound) = await _checkOrderRequestClient.GetResponse<OrderStatus,OrderNotFound>(new { OrderId = id });
+
+            if(status.IsCompletedSuccessfully)
+            {
+                var response = await status;
+                return Ok(response.Message);
+            }
+            else
+            {
+                var response = await notfound;
+                return NotFound(response.Message);
             }
         }
     }

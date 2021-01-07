@@ -1,4 +1,5 @@
 ﻿using mass.components.Consumers;
+using mass.components.StateMachines;
 using MassTransit;
 using MassTransit.Definition;
 using MassTransit.RabbitMqTransport;
@@ -32,6 +33,7 @@ namespace Mass.Service
                    services.AddMassTransit(cfg =>
                    {
                        cfg.AddConsumersFromNamespaceContaining<SubmitOrderConsumer>();
+                       cfg.AddSagaStateMachine<OrderStateMachine, OrderState>(typeof(OrderStateMachineDefinition)).RedisRepository();
                        //cfg.UsingRabbitMq(ConfigureBus);
                        cfg.AddBus(ConfigureBus);
                        //cfg.AddRequestClient<AllocateInventory>();
@@ -49,13 +51,24 @@ namespace Mass.Service
 
             await builder.RunConsoleAsync();
         }
-        static IBusControl ConfigureBus(IServiceProvider provider)
+
+        private static IBusControl ConfigureBus(IRegistrationContext<IServiceProvider> arg)
         {
             return Bus.Factory.CreateUsingRabbitMq(cfg =>
             {
-                cfg.ConfigureEndpoints(provider);
+                cfg.ConfigureEndpoints(arg);
 
             });
         }
+
+        //obsolete
+        //static IBusControl ConfigureBus(IServiceProvider provider)
+        //{
+        //    return Bus.Factory.CreateUsingRabbitMq(cfg =>
+        //    {
+        //        cfg.ConfigureEndpoints(provider);
+
+        //    });
+        //}
     }
 }
