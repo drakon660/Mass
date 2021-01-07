@@ -11,6 +11,11 @@ namespace mass.components.Consumers
     public class SubmitOrderConsumer : IConsumer<SubmitOrder>
     {
         private readonly ILogger<SubmitOrderConsumer> _logger;
+        public SubmitOrderConsumer()
+        {
+        
+        }
+
         public SubmitOrderConsumer(ILogger<SubmitOrderConsumer> logger)
         {
             _logger = logger;
