@@ -3,6 +3,8 @@ using GreenPipes;
 using mass.contracts;
 using System;
 using System.Threading.Tasks;
+using mass.components.Consumers;
+using MassTransit;
 
 namespace mass.components.StateMachines.OrderStateMachineActivities
 {
@@ -20,6 +22,13 @@ namespace mass.components.StateMachines.OrderStateMachineActivities
 
         public async Task Execute(BehaviorContext<OrderState, OrderAccepted> context, Behavior<OrderState, OrderAccepted> next)
         {
+            var consumeContext = context.GetPayload<ConsumeContext>();
+            var sendEndpoint = await consumeContext.GetSendEndpoint(new Uri("queue:fullfill-order"));
+            await sendEndpoint.Send<FullfillOrder>(new
+            {
+                OrderId = context.Data.OrderId
+            });
+            
             //TODO test what you have in arguments
             await next.Execute(context).ConfigureAwait(false);
         }

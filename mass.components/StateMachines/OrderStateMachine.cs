@@ -25,7 +25,8 @@ namespace mass.components.StateMachines
                 }));
              });
             
-            Event(() => AccountClosed, x => x.CorrelateBy((saga,context)=>saga.CustomerNumber == context.Message.CustomerNumber));
+            Event(() => AccountClosed, x 
+                => x.CorrelateBy((saga,context)=>saga.CustomerNumber == context.Message.CustomerNumber));
 
             InstanceState(x => x.CurrentState);
 

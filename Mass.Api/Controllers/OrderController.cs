@@ -17,12 +17,15 @@ namespace Mass.Api.Controllers
         private readonly IRequestClient<SubmitOrder> _submitOrderRequestClient;
         private readonly IRequestClient<CheckOrder> _checkOrderRequestClient;
         private readonly ISendEndpointProvider _sendEndpointProvider;
+        private readonly IPublishEndpoint _publishEndpoint;
 
-        public OrderController(IRequestClient<SubmitOrder> submitOrderRequestClient, IRequestClient<CheckOrder> checkOrderRequestClient, ISendEndpointProvider sendEndpointProvider)
+        public OrderController(IRequestClient<SubmitOrder> submitOrderRequestClient, IRequestClient<CheckOrder> checkOrderRequestClient, 
+            ISendEndpointProvider sendEndpointProvider, IPublishEndpoint publishEndpoint)
         {
             _submitOrderRequestClient = submitOrderRequestClient;
             _checkOrderRequestClient = checkOrderRequestClient;
             _sendEndpointProvider = sendEndpointProvider;
+            _publishEndpoint = publishEndpoint;
         }
 
 
@@ -41,7 +44,7 @@ namespace Mass.Api.Controllers
             return Accepted();
         }
 
-
+    
 
         [HttpPost]
         public async Task<IActionResult> Post(OrderViewModel model)
@@ -80,7 +83,7 @@ namespace Mass.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get(Guid id)
+        public async Task<IActionResult> Get(string id)
         {
             var (status,notfound) = await _checkOrderRequestClient.GetResponse<OrderStatus,OrderNotFound>(new { OrderId = id });
 
@@ -94,6 +97,16 @@ namespace Mass.Api.Controllers
                 var response = await notfound;
                 return NotFound(response.Message);
             }
+        }
+
+        [HttpPatch]
+        public async Task Patch(Guid id)
+        {
+            await _publishEndpoint.Publish<OrderAccepted>(new
+            {
+                OrderId = id,
+                InVar.Timestamp
+            });
         }
     }
 }

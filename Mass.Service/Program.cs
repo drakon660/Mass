@@ -11,6 +11,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
+using mass.components.CourierActivities;
+using mass.components.StateMachines.OrderStateMachineActivities;
+using WareHouse.Contracts;
 
 namespace Mass.Service
 {
@@ -29,18 +32,23 @@ namespace Mass.Service
                })
                .ConfigureServices((hostContext, services) =>
                {
+
+                   services.AddScoped<AcceptOrderActivity>();
                    services.TryAddSingleton(KebabCaseEndpointNameFormatter.Instance);
 
                    services.AddMassTransit(cfg =>
                    {
                        cfg.AddConsumersFromNamespaceContaining<SubmitOrderConsumer>();
+                       cfg.AddConsumersFromNamespaceContaining<FullfillOrderConsumer>();
+                       cfg.AddActivitiesFromNamespaceContaining<AllocateInventoryActivity>();
+                       
                        cfg.AddSagaStateMachine<OrderStateMachine, OrderState>(typeof(OrderStateMachineDefinition)).MongoDbRepository(cfg=> {
                            cfg.Connection = "mongodb://127.0.0.1";
                            cfg.DatabaseName = "orderdb";
                        });
                        //cfg.UsingRabbitMq(ConfigureBus);
                        cfg.AddBus(ConfigureBus);
-                       //cfg.AddRequestClient<AllocateInventory>();
+                       cfg.AddRequestClient<AllocateInventory>();
                    });
 
                    services.AddHostedService<MassTransitConsoleHostedService>();

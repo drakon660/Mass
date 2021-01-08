@@ -19,8 +19,7 @@ namespace Mass.Components.Tests
         public async Task Should_create_a_state_instance()
         {
             var orderStateMachine = new OrderStateMachine();
-            var harness = new InMemoryTestHarness();
-            harness.TestTimeout = TimeSpan.FromSeconds(5);
+            var harness = new InMemoryTestHarness {TestTimeout = TimeSpan.FromSeconds(5)};
             var saga = harness.StateMachineSaga<OrderState,OrderStateMachine>(new OrderStateMachine());
 
             await harness.Start();
@@ -33,7 +32,6 @@ namespace Mass.Components.Tests
                     InVar.Timestamp,
                     CustomerNumber = "123456"
                 });
-
 
                 var instance = saga.Created.Contains(orderId);
                 await saga.Exists(orderId, x => x.Submitted); //race condtion wait for state change
@@ -53,8 +51,7 @@ namespace Mass.Components.Tests
         public async Task Should_respond_to_status_checks()
         {
             var orderStateMachine = new OrderStateMachine();
-            var harness = new InMemoryTestHarness();
-            harness.TestTimeout = TimeSpan.FromSeconds(5);
+            var harness = new InMemoryTestHarness {TestTimeout = TimeSpan.FromSeconds(5)};
             var saga = harness.StateMachineSaga<OrderState, OrderStateMachine>(new OrderStateMachine());
 
             await harness.Start();
@@ -88,8 +85,7 @@ namespace Mass.Components.Tests
         public async Task Should_cancel_when_customer_account_closed()
         {
             var orderStateMachine = new OrderStateMachine();
-            var harness = new InMemoryTestHarness();
-            harness.TestTimeout = TimeSpan.FromSeconds(5);
+            var harness = new InMemoryTestHarness {TestTimeout = TimeSpan.FromSeconds(5)};
             var saga = harness.StateMachineSaga<OrderState, OrderStateMachine>(new OrderStateMachine());
 
             await harness.Start();
@@ -105,7 +101,7 @@ namespace Mass.Components.Tests
                 });
 
                 var instance = saga.Created.Contains(orderId);
-                var instanceId = await saga.Exists(orderId, x => x.Submitted); //race condtion wait for state change
+                var instanceId = await saga.Exists(orderId, x => x.Submitted); //race condition wait for state change
                 Assert.NotNull(instanceId);
 
                 await harness.Bus.Publish<CustomerAccountClosed>(new { 
@@ -127,8 +123,7 @@ namespace Mass.Components.Tests
         public async Task Should_accept_when_order_is_accepted()
         {
             var orderStateMachine = new OrderStateMachine();
-            var harness = new InMemoryTestHarness();
-            harness.TestTimeout = TimeSpan.FromSeconds(5);
+            var harness = new InMemoryTestHarness {TestTimeout = TimeSpan.FromSeconds(5)};
             var saga = harness.StateMachineSaga<OrderState, OrderStateMachine>(new OrderStateMachine());
 
             await harness.Start();
