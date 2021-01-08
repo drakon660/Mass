@@ -1,4 +1,5 @@
 ﻿using Automatonymous;
+using mass.components.StateMachines.OrderStateMachineActivities;
 using mass.contracts;
 using MassTransit;
 using System;
@@ -12,6 +13,7 @@ namespace mass.components.StateMachines
         public OrderStateMachine()
         {
             Event(() => OrderSubmitted, x => x.CorrelateById(m => m.Message.OrderId));
+            Event(() => OrderAccepted, x => x.CorrelateById(m => m.Message.OrderId));
             Event(() => OrderStatusRequested, x => {
                 x.CorrelateById(m => m.Message.OrderId);
                 x.OnMissingInstance(m => m.ExecuteAsync(async context =>
@@ -22,6 +24,8 @@ namespace mass.components.StateMachines
                     }
                 }));
              });
+            
+            Event(() => AccountClosed, x => x.CorrelateBy((saga,context)=>saga.CustomerNumber == context.Message.CustomerNumber));
 
             InstanceState(x => x.CurrentState);
 
@@ -32,7 +36,9 @@ namespace mass.components.StateMachines
                 context.Instance.Updated = DateTime.UtcNow;
             }).TransitionTo(Submitted));
 
-            During(Submitted, Ignore(OrderSubmitted));
+            During(Submitted, Ignore(OrderSubmitted), When(AccountClosed).TransitionTo(Canceled)
+                ,When(OrderAccepted).Activity((x)=>x.OfType<AcceptOrderActivity>()).TransitionTo(Accepted)
+                );
 
             DuringAny(When(OrderStatusRequested).RespondAsync(x=>x.Init<OrderStatus>(new {
                 OrderId = x.Instance.CorrelationId,
@@ -49,8 +55,12 @@ namespace mass.components.StateMachines
         }
 
         public State Submitted { get; private set; }
+        public State Canceled { get; private set; }
+        public State Accepted { get; private set; }
 
         public Event<OrderSubmitted> OrderSubmitted { get; private set; }
+        public Event<CustomerAccountClosed> AccountClosed { get; private set; }
+        public Event<OrderAccepted> OrderAccepted { get; private set; }
         public Event<CheckOrder> OrderStatusRequested { get; private set; }
     }
 }

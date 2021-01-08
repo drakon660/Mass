@@ -1,4 +1,5 @@
-﻿using mass.components.Consumers;
+﻿using Automatonymous.Graphing;
+using mass.components.Consumers;
 using mass.components.StateMachines;
 using mass.contracts;
 using MassTransit;
@@ -81,6 +82,93 @@ namespace Mass.Components.Tests
             {
                 await harness.Stop();
             }
+        }
+
+        [Fact]
+        public async Task Should_cancel_when_customer_account_closed()
+        {
+            var orderStateMachine = new OrderStateMachine();
+            var harness = new InMemoryTestHarness();
+            harness.TestTimeout = TimeSpan.FromSeconds(5);
+            var saga = harness.StateMachineSaga<OrderState, OrderStateMachine>(new OrderStateMachine());
+
+            await harness.Start();
+            try
+            {
+                var orderId = NewId.NextGuid();
+
+                await harness.Bus.Publish<OrderSubmitted>(new
+                {
+                    OrderId = orderId,
+                    InVar.Timestamp,
+                    CustomerNumber = "123456"
+                });
+
+                var instance = saga.Created.Contains(orderId);
+                var instanceId = await saga.Exists(orderId, x => x.Submitted); //race condtion wait for state change
+                Assert.NotNull(instanceId);
+
+                await harness.Bus.Publish<CustomerAccountClosed>(new { 
+                    CustomerId = InVar.Id,
+                    CustomerNumber = "123456"
+                });
+
+                instanceId = await saga.Exists(orderId, x => x.Canceled);
+                Assert.NotNull(instanceId);
+            }
+            finally
+            {
+                await harness.Stop();
+            }
+        }
+
+
+        [Fact]
+        public async Task Should_accept_when_order_is_accepted()
+        {
+            var orderStateMachine = new OrderStateMachine();
+            var harness = new InMemoryTestHarness();
+            harness.TestTimeout = TimeSpan.FromSeconds(5);
+            var saga = harness.StateMachineSaga<OrderState, OrderStateMachine>(new OrderStateMachine());
+
+            await harness.Start();
+            try
+            {
+                var orderId = NewId.NextGuid();
+
+                await harness.Bus.Publish<OrderSubmitted>(new
+                {
+                    OrderId = orderId,
+                    InVar.Timestamp,
+                    CustomerNumber = "123456"
+                });
+
+                var instance = saga.Created.Contains(orderId);
+                var instanceId = await saga.Exists(orderId, x => x.Submitted); //race condtion wait for state change
+                Assert.NotNull(instanceId);
+
+                await harness.Bus.Publish<OrderAccepted>(new
+                {
+                    OrderId = orderId
+                });
+
+                instanceId = await saga.Exists(orderId, x => x.Accepted);
+                Assert.NotNull(instanceId);
+            }
+            finally
+            {
+                await harness.Stop();
+            }
+        }
+
+
+        //TODO check visual for masstransit statemachine
+        [Fact]
+        public void Show_me_the_state_machine()
+        {
+            var orderStateMachine = new OrderStateMachine();
+            var graph = orderStateMachine.GetGraph();
+
         }
     }
 }

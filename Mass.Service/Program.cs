@@ -2,6 +2,7 @@
 using mass.components.StateMachines;
 using MassTransit;
 using MassTransit.Definition;
+using MassTransit.MongoDbIntegration;
 using MassTransit.RabbitMqTransport;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,7 +34,10 @@ namespace Mass.Service
                    services.AddMassTransit(cfg =>
                    {
                        cfg.AddConsumersFromNamespaceContaining<SubmitOrderConsumer>();
-                       cfg.AddSagaStateMachine<OrderStateMachine, OrderState>(typeof(OrderStateMachineDefinition)).RedisRepository();
+                       cfg.AddSagaStateMachine<OrderStateMachine, OrderState>(typeof(OrderStateMachineDefinition)).MongoDbRepository(cfg=> {
+                           cfg.Connection = "mongodb://127.0.0.1";
+                           cfg.DatabaseName = "orderdb";
+                       });
                        //cfg.UsingRabbitMq(ConfigureBus);
                        cfg.AddBus(ConfigureBus);
                        //cfg.AddRequestClient<AllocateInventory>();
