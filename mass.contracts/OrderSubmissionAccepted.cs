@@ -8,5 +8,6 @@ namespace mass.contracts
         DateTime Timestamp { get; }
 
         string CustomerNumber { get; }
+        string PaymentCardNumber { get; }
     }
 }

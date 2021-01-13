@@ -19,7 +19,8 @@ namespace mass.components.CourierActivities
         {
             var oderId = context.Arguments.OrderId;
             
-            string itemNumber = context.Arguments.ItemNumber ?? throw new ArgumentNullException(nameof(itemNumber));
+            string itemNumber = context.Arguments.ItemNumber ?? 
+                                throw new ArgumentNullException(nameof(itemNumber));
             
             var quantity = context.Arguments.Quantity;
 

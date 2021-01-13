@@ -26,7 +26,10 @@ namespace mass.components.StateMachines.OrderStateMachineActivities
             var sendEndpoint = await consumeContext.GetSendEndpoint(new Uri("queue:fullfill-order"));
             await sendEndpoint.Send<FullfillOrder>(new
             {
-                OrderId = context.Data.OrderId
+                OrderId = context.Data.OrderId,
+
+                context.Instance.CustomerNumber,
+                PaymentCardNumber = context.Instance.PaymentCardNumber
             });
             
             //TODO test what you have in arguments

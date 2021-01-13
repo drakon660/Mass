@@ -32,7 +32,9 @@ namespace Mass.Service
                })
                .ConfigureServices((hostContext, services) =>
                {
-
+                   //TODO check applicationinsight telemetry
+                   //services.AddApplicationInsightsTelemetry();
+                   
                    services.AddScoped<AcceptOrderActivity>();
                    services.TryAddSingleton(KebabCaseEndpointNameFormatter.Instance);
 
@@ -40,6 +42,7 @@ namespace Mass.Service
                    {
                        cfg.AddConsumersFromNamespaceContaining<SubmitOrderConsumer>();
                        cfg.AddConsumersFromNamespaceContaining<FullfillOrderConsumer>();
+                       cfg.AddConsumersFromNamespaceContaining<RoutingSlipEventConsumer>();
                        cfg.AddActivitiesFromNamespaceContaining<AllocateInventoryActivity>();
                        
                        cfg.AddSagaStateMachine<OrderStateMachine, OrderState>(typeof(OrderStateMachineDefinition)).MongoDbRepository(cfg=> {

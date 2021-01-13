@@ -61,7 +61,8 @@ namespace mass.components.Consumers
                 {
                     InVar.Timestamp,
                     context.Message.OrderId,
-                    context.Message.CustomerNumber
+                    context.Message.CustomerNumber,
+                    context.Message.PaymentCardNumber
                 });
         }
     }

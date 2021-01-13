@@ -57,7 +57,7 @@ namespace Mass.Api.Controllers
                 OrderId = model.Id,
                 InVar.Timestamp,
                 model.CustomerNumber,
-                //model.PaymentCardNumber,
+                model.PaymentCardNumber,
                 //model.Notes
             });
 

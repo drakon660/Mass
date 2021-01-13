@@ -8,8 +8,7 @@ namespace Mass.Api.Models
 {
     public class OrderViewModel
     {
-        [Required]
-        public Guid Id { get; set; }
+        [Required] public Guid Id { get; set; } = new Guid();
 
         [Required]
         public string CustomerNumber { get; set; }
