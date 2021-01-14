@@ -11,8 +11,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
+using mass.components.BatchConsumers;
 using mass.components.CourierActivities;
 using mass.components.StateMachines.OrderStateMachineActivities;
+using MassTransit.Courier.Contracts;
 using WareHouse.Contracts;
 
 namespace Mass.Service
@@ -35,6 +37,7 @@ namespace Mass.Service
                    //TODO check applicationinsight telemetry
                    //services.AddApplicationInsightsTelemetry();
                    
+                   services.AddScoped<RoutingSlipBatchEventConsumer>();
                    services.AddScoped<AcceptOrderActivity>();
                    services.TryAddSingleton(KebabCaseEndpointNameFormatter.Instance);
 
@@ -70,8 +73,21 @@ namespace Mass.Service
         private static IBusControl ConfigureBus(IRegistrationContext<IServiceProvider> arg)
         {
             return Bus.Factory.CreateUsingRabbitMq(cfg =>
-            {
+            {   
+                cfg.UseMessageScheduler(new Uri("queue:quartz"));
                 cfg.ConfigureEndpoints(arg);
+                cfg.ReceiveEndpoint(KebabCaseEndpointNameFormatter.Instance.Consumer<RoutingSlipBatchEventConsumer>(),
+                    e =>
+                    {
+                        e.PrefetchCount = 20;
+                        e.Batch<RoutingSlipCompleted>(b=>
+                        {
+                            b.MessageLimit = 10;
+                            b.TimeLimit = TimeSpan.FromSeconds(5);
+                            b.Consumer<RoutingSlipBatchEventConsumer, RoutingSlipCompleted>(arg.Container);
+                        });
+                    });
+                    
 
             });
         }

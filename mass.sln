@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Warehouse.Service", "Wareho
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Warehouse.Components", "Warehouse.Components\Warehouse.Components.csproj", "{6D34D2E6-2BC1-4F87-82B7-CDD29DA1C144}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client.Console", "Client.Console\Client.Console.csproj", "{F5738071-EE98-4D34-98E6-21D8CFB8C792}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +67,10 @@ Global
 		{6D34D2E6-2BC1-4F87-82B7-CDD29DA1C144}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D34D2E6-2BC1-4F87-82B7-CDD29DA1C144}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D34D2E6-2BC1-4F87-82B7-CDD29DA1C144}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5738071-EE98-4D34-98E6-21D8CFB8C792}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5738071-EE98-4D34-98E6-21D8CFB8C792}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5738071-EE98-4D34-98E6-21D8CFB8C792}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5738071-EE98-4D34-98E6-21D8CFB8C792}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

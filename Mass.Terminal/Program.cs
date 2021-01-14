@@ -11,8 +11,10 @@ namespace Mass.Terminal
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
+            await Task.Delay(1000);
+            
             var serviceProvider = ConfigureServiceProvider();
 
             var bus = serviceProvider.GetRequiredService<IBusControl>();

@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using GreenPipes;
 using MassTransit;
 using MassTransit.ConsumeConfigurators;
@@ -28,11 +27,4 @@ namespace mass.components.Consumers
 
     
     //TODO consumer for faulted massages
-    public class FaultConsumer : IConsumer<Fault<FullfillOrder>>
-    {
-        public Task Consume(ConsumeContext<Fault<FullfillOrder>> context)
-        {
-            throw new NotImplementedException();
-        }
-    }
 }

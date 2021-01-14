@@ -6,7 +6,8 @@ using Microsoft.Extensions.Logging;
 
 namespace mass.components.Consumers
 {
-    public class RoutingSlipEventConsumer : IConsumer<RoutingSlipCompleted>, IConsumer<RoutingSlipActivityCompleted>, IConsumer<RoutingSlipFaulted>
+    public class RoutingSlipEventConsumer : //IConsumer<RoutingSlipCompleted>, 
+        IConsumer<RoutingSlipActivityCompleted>, IConsumer<RoutingSlipFaulted>
     {
         private readonly ILogger<RoutingSlipEventConsumer> _logger;
 
@@ -14,13 +15,13 @@ namespace mass.components.Consumers
         {
             _logger = logger;
         }
-        public Task Consume(ConsumeContext<RoutingSlipCompleted> context)
-        {
-            if(_logger.IsEnabled(LogLevel.Debug))
-                _logger.Log(LogLevel.Information, $"Routing Slip Completed: {context.Message.TrackingNumber}");
-            
-            return Task.CompletedTask;
-        }
+        // public Task Consume(ConsumeContext<RoutingSlipCompleted> context)
+        // {
+        //     if(_logger.IsEnabled(LogLevel.Debug))
+        //         _logger.Log(LogLevel.Information, $"Routing Slip Completed: {context.Message.TrackingNumber}");
+        //     
+        //     return Task.CompletedTask;
+        // }
 
         public Task Consume(ConsumeContext<RoutingSlipActivityCompleted> context)
         {
