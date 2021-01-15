@@ -15,6 +15,7 @@ using mass.components.BatchConsumers;
 using mass.components.CourierActivities;
 using mass.components.StateMachines.OrderStateMachineActivities;
 using MassTransit.Courier.Contracts;
+using MassTransit.MongoDbIntegration.MessageData;
 using WareHouse.Contracts;
 
 namespace Mass.Service
@@ -74,6 +75,7 @@ namespace Mass.Service
         {
             return Bus.Factory.CreateUsingRabbitMq(cfg =>
             {   
+                cfg.UseMessageData(new MongoDbMessageDataRepository("mongodb://127.0.0.1", "attachments"));
                 cfg.UseMessageScheduler(new Uri("queue:quartz"));
                 cfg.ConfigureEndpoints(arg);
                 cfg.ReceiveEndpoint(KebabCaseEndpointNameFormatter.Instance.Consumer<RoutingSlipBatchEventConsumer>(),

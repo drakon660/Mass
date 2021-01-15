@@ -15,6 +15,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using MassTransit.RabbitMqTransport;
 using MassTransit.Definition;
+using MassTransit.MessageData;
+using MassTransit.MongoDbIntegration.MessageData;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Mass.Api
@@ -50,15 +52,20 @@ namespace Mass.Api
             services.AddMassTransit(cfg =>
             {
                 cfg.AddConsumer<SubmitOrderConsumer>();
-                cfg.AddBus(x => Bus.Factory.CreateUsingRabbitMq());
+                cfg.AddBus(x => { return Bus.Factory.CreateUsingRabbitMq(b =>
+                    {
+                        //MessageDataDefaults.
+                        b.UseMessageData(new MongoDbMessageDataRepository("mongodb://127.0.0.1", "attachments"));
+                    });
+                });
                 cfg.AddRequestClient<SubmitOrder>();
                 cfg.AddRequestClient<CheckOrder>();
+                
                 //cfg.AddRequestClient<SubmitOrder>(new Uri($"queue :{KebabCaseEndpointNameFormatter.Instance.Consumer<SubmitOrderConsumer>()}"));
                 //cfg.AddRequestClient<SubmitOrder>(new Uri($"exchange :{KebabCaseEndpointNameFormatter.Instance.Consumer<SubmitOrderConsumer>()}"));
                 //cfg.AddRequestClient<AllocateInventory>();
             });
-
-
+            
             services.AddMassTransitHostedService();
 
             services.AddControllers();

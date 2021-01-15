@@ -1,0 +1,21 @@
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
+WORKDIR /src
+
+
+COPY ./Warehouse.Contracts/*.csproj ./Warehouse.Contracts/
+
+COPY ./mass.contracts/*.csproj ./mass.contracts/
+COPY ./mass.components/*.csproj ./mass.components/
+COPY ./Mass.Startup/*.csproj ./Mass.Startup/
+RUN dotnet restore -r linux-musl-x64 ./Mass.Startup/Mass.Startup.csproj 
+
+COPY . .
+RUN dotnet publish -c Release -o /app -r linux-musl-x64 --no-restore ./Mass.Startup/Mass.Startup.csproj 
+
+FROM masstransit/platform:6.3.2
+WORKDIR /app
+ARG MT_APP=/app
+ENV MT_APP="${MT_APP}"
+COPY --from=build /app ./
+
+

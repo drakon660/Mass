@@ -39,13 +39,13 @@ namespace mass.components.Consumers
                 return;
             }
 
-            //MessageData<string> notes = context.Message.Notes;
-            //if (notes?.HasValue ?? false)
-            //{
-            //    string notesValue = await notes.Value;
+            MessageData<string> notes = context.Message.Notes;
+            if (notes?.HasValue ?? false)
+            {
+                string notesValue = await notes.Value;
 
-            //    Console.WriteLine("NOTES: {0}", notesValue);
-            //}
+                Console.WriteLine("NOTES: {0}", notesValue);
+            }
 
             await context.Publish<OrderSubmitted>(new
             {

@@ -58,6 +58,7 @@ namespace Mass.Api.Controllers
                 InVar.Timestamp,
                 model.CustomerNumber,
                 model.PaymentCardNumber,
+                model.Notes
                 //model.Notes
             });
 
