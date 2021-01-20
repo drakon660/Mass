@@ -16,7 +16,7 @@ namespace Mass.Startup
 {
     public class MassStartup : IPlatformStartup
     {
-        public void ConfigureMassTransit(IServiceCollectionConfigurator configurator, IServiceCollection services)
+        public void ConfigureMassTransit(IServiceCollectionBusConfigurator configurator, IServiceCollection services)
         {
             services.AddScoped<AcceptOrderActivity>();
             services.AddScoped<RoutingSlipBatchEventConsumer>();
@@ -34,7 +34,7 @@ namespace Mass.Startup
             configurator.AddRequestClient<AllocateInventory>();
         }
 
-        public void ConfigureBus<TEndpointConfigurator>(IBusFactoryConfigurator<TEndpointConfigurator> configurator, IRegistrationContext<IServiceProvider> context) 
+        public void ConfigureBus<TEndpointConfigurator>(IBusFactoryConfigurator<TEndpointConfigurator> configurator, IBusRegistrationContext context) 
             where TEndpointConfigurator : IReceiveEndpointConfigurator
         {
             configurator.UseMessageData(new MongoDbMessageDataRepository("mongodb://127.0.0.1", "attachments"));

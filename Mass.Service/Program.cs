@@ -54,7 +54,25 @@ namespace Mass.Service
                            cfg.DatabaseName = "orderdb";
                        });
                        //cfg.UsingRabbitMq(ConfigureBus);
-                       cfg.AddBus(ConfigureBus);
+                       //cfg.AddBus(ConfigureBus);
+                       cfg.UsingRabbitMq((context, configurator) =>
+                       {
+                           configurator.UseMessageData(new MongoDbMessageDataRepository("mongodb://127.0.0.1", "attachments"));
+                           configurator.UseMessageScheduler(new Uri("queue:quartz"));
+                           configurator.ConfigureEndpoints(context);
+                           configurator.ReceiveEndpoint(KebabCaseEndpointNameFormatter.Instance.Consumer<RoutingSlipBatchEventConsumer>(),
+                               e =>
+                               {
+                                   e.PrefetchCount = 20;
+                                   e.Batch<RoutingSlipCompleted>(b=>
+                                   {
+                                       b.MessageLimit = 10;
+                                       b.TimeLimit = TimeSpan.FromSeconds(5);
+                                       b.Consumer<RoutingSlipBatchEventConsumer, RoutingSlipCompleted>(context);
+                                   });
+                               });
+                           
+                       });
                        cfg.AddRequestClient<AllocateInventory>();
                    });
 
@@ -71,28 +89,28 @@ namespace Mass.Service
             await builder.RunConsoleAsync();
         }
 
-        private static IBusControl ConfigureBus(IRegistrationContext<IServiceProvider> arg)
-        {
-            return Bus.Factory.CreateUsingRabbitMq(cfg =>
-            {   
-                cfg.UseMessageData(new MongoDbMessageDataRepository("mongodb://127.0.0.1", "attachments"));
-                cfg.UseMessageScheduler(new Uri("queue:quartz"));
-                cfg.ConfigureEndpoints(arg);
-                cfg.ReceiveEndpoint(KebabCaseEndpointNameFormatter.Instance.Consumer<RoutingSlipBatchEventConsumer>(),
-                    e =>
-                    {
-                        e.PrefetchCount = 20;
-                        e.Batch<RoutingSlipCompleted>(b=>
-                        {
-                            b.MessageLimit = 10;
-                            b.TimeLimit = TimeSpan.FromSeconds(5);
-                            b.Consumer<RoutingSlipBatchEventConsumer, RoutingSlipCompleted>(arg.Container);
-                        });
-                    });
-                    
-
-            });
-        }
+        // private static IBusControl ConfigureBus(IBusRegistrationContext arg)
+        // {
+        //     return Bus.Factory.CreateUsingRabbitMq(cfg =>
+        //     {   
+        //         cfg.UseMessageData(new MongoDbMessageDataRepository("mongodb://127.0.0.1", "attachments"));
+        //         cfg.UseMessageScheduler(new Uri("queue:quartz"));
+        //         cfg.ConfigureEndpoints(arg);
+        //         cfg.ReceiveEndpoint(KebabCaseEndpointNameFormatter.Instance.Consumer<RoutingSlipBatchEventConsumer>(),
+        //             e =>
+        //             {
+        //                 e.PrefetchCount = 20;
+        //                 e.Batch<RoutingSlipCompleted>(b=>
+        //                 {
+        //                     b.MessageLimit = 10;
+        //                     b.TimeLimit = TimeSpan.FromSeconds(5);
+        //                     b.Consumer<RoutingSlipBatchEventConsumer, RoutingSlipCompleted>(arg);
+        //                 });
+        //             });
+        //             
+        //
+        //     });
+        // }
 
         //obsolete
         //static IBusControl ConfigureBus(IServiceProvider provider)

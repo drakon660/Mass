@@ -52,12 +52,17 @@ namespace Mass.Api
             services.AddMassTransit(cfg =>
             {
                 cfg.AddConsumer<SubmitOrderConsumer>();
-                cfg.AddBus(x => { return Bus.Factory.CreateUsingRabbitMq(b =>
-                    {
-                        //MessageDataDefaults.
-                        b.UseMessageData(new MongoDbMessageDataRepository("mongodb://127.0.0.1", "attachments"));
-                    });
+                cfg.UsingRabbitMq((context, configurator) =>
+                {
+                    configurator.UseMessageData(new MongoDbMessageDataRepository("mongodb://127.0.0.1", "attachments"));
+                    
                 });
+                // cfg.AddBus(x => { return Bus.Factory.CreateUsingRabbitMq(b =>
+                //     {
+                //         //MessageDataDefaults.
+                //         b.UseMessageData(new MongoDbMessageDataRepository("mongodb://127.0.0.1", "attachments"));
+                //     });
+                // });
                 cfg.AddRequestClient<SubmitOrder>();
                 cfg.AddRequestClient<CheckOrder>();
                 

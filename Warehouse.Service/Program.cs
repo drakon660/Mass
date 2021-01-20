@@ -34,11 +34,16 @@ namespace Warehouse.Service
                     {
                         cfg.AddConsumersFromNamespaceContaining<AllocateInventoryConsumer>();
                         cfg.AddSagaStateMachine<AllocationStateMachine, AllocationState>(typeof(AllocateStateMachineDefinition))
-                            .MongoDbRepository(cfg=> {
-                            cfg.Connection = "mongodb://127.0.0.1";
-                            cfg.DatabaseName = "allocations";
-                        });;
-                        cfg.AddBus(ConfigureBus);
+                            .MongoDbRepository(x=> {
+                            x.Connection = "mongodb://127.0.0.1";
+                            x.DatabaseName = "allocations";
+                        });
+                        
+                        cfg.UsingRabbitMq((context, configurator) =>
+                        {
+                            configurator.UseMessageScheduler(new Uri("rabbitmq://localhost/quartz"));
+                            configurator.ConfigureEndpoints(context);
+                        });
                     });
 
                     services.AddHostedService<MassTransitConsoleHostedService>();
@@ -52,15 +57,6 @@ namespace Warehouse.Service
 
 
             await builder.RunConsoleAsync();
-        }
-        private static IBusControl ConfigureBus(IRegistrationContext<IServiceProvider> arg)
-        {
-            return Bus.Factory.CreateUsingRabbitMq(cfg =>
-            {
-                cfg.UseMessageScheduler(new Uri("rabbitmq://localhost/quartz"));
-                cfg.ConfigureEndpoints(arg);
-
-            });
         }
     }
     

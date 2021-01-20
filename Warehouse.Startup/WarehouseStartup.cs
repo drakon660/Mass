@@ -11,7 +11,7 @@ namespace Warehouse.Startup
 {
     public class WarehouseStartup : IPlatformStartup
     {
-        public void ConfigureMassTransit(IServiceCollectionConfigurator configurator, IServiceCollection services)
+        public void ConfigureMassTransit(IServiceCollectionBusConfigurator configurator, IServiceCollection services)
         {
             configurator.AddConsumersFromNamespaceContaining<AllocateInventoryConsumer>();
             configurator.AddSagaStateMachine<AllocationStateMachine, AllocationState>(typeof(AllocateStateMachineDefinition))
@@ -21,7 +21,7 @@ namespace Warehouse.Startup
                 });;
         }
 
-        public void ConfigureBus<TEndpointConfigurator>(IBusFactoryConfigurator<TEndpointConfigurator> configurator, IRegistrationContext<IServiceProvider> context) 
+        public void ConfigureBus<TEndpointConfigurator>(IBusFactoryConfigurator<TEndpointConfigurator> configurator, IBusRegistrationContext context) 
             where TEndpointConfigurator : IReceiveEndpointConfigurator
         {
           
